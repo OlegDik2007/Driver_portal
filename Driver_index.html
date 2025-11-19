@@ -166,7 +166,8 @@ Oleg, [11/13/25 7:06 PM]
 
             if (pollVoted) {
                 // Show Results
-                let resultsHtml = <h4 class="text-lg font-bold mb-3 text-logi-blue">Current Results (${totalVotes} votes)</h4>;
+                let resultsHtml = `<h4 class="text-lg font-bold mb-3 text-logi-blue">Current Results (${totalVotes} votes)</h4>`;
+
                 
                 Object.keys(pollResults).forEach(key => {
                     const count = pollResults[key];
@@ -275,7 +276,8 @@ const messageBox = document.getElementById('messageBox');
                     const formData = new FormData(form);
                     const data = Object.fromEntries(formData.entries());
 
-                    if (!data.fullName  !data.phone  !data.email  data.cdlClass === ""  !data.yearsExperience) {
+                    if (!data.fullName || !data.phone || !data.email || data.cdlClass === "" || !data.yearsExperience) {
+
                         showMessage("🛑 Error: Please complete all required fields.", 'bg-red-500');
                         submitButton.disabled = false;
                         submitButton.innerHTML = "Submit Quick Match";
@@ -301,7 +303,8 @@ const messageBox = document.getElementById('messageBox');
                  */
                 function showMessage(message, colorClass) {
                     messageBox.textContent = message;
-                    messageBox.className = p-4 mt-4 rounded-lg text-white font-semibold transition-all duration-300 ${colorClass};
+                    messageBox.className = `p-4 mt-4 rounded-lg text-white font-semibold transition-all duration-300 ${colorClass}`;
+
                     messageBox.classList.remove('hidden');
                     messageBox.classList.add('block');
 
