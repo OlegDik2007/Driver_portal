@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDL Driver Recruiting - National Carrier Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for professional look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styles for professional, logistics-themed look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1f2937;
+        }
+        .text-logi-blue { color: #0077b6; }
+        .bg-logi-blue { background-color: #0077b6; }
+        .bg-logi-orange { background-color: #ff9800; }
+        .hover-effect:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); }
+
+        /* Style for the active navigation link */
+        .nav-link.active {
+            font-weight: 700;
+            color: #ff9800; /* Safety Orange for active link */
+            border-bottom: 3px solid #ff9800;
+        }
+
+        /* Specific style for the humor box */
+        .hub-joke-box {
+            background-color: #fff3e0; /* Light orange/cream */
+            border: 2px dashed #ff9800;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'logi-blue': '#0077b6',
+                        'logi-orange': '#ff9800',
+                    }
+                }
+            }
+        }
+        
+        // Mock Carrier Data (14 Partners)
+        const mockCarriers = [
+            { name: "Atlas Freight", focus: "Regional Dry Van", icon: "box" },
+            { name: "Apex Logistics", focus: "OTR Reefer", icon: "snowflake" },
+            { name: "Sentinel Transport", focus: "Dedicated Flatbed", icon: "box" },
+            { name: "Coastline Trucking", focus: "Local P&D", icon: "map-pin" },
+            { name: "Pinnacle Haulers", focus: "Hazmat Tanker", icon: "flask-conical" },
+            { name: "Midland Express", focus: "Dry Van OTR", icon: "box" },
+            { name: "Cascade Carriers", focus: "Team Driving", icon: "users" },
+            { name: "Desert Runner", focus: "Oil & Gas Routes", icon: "fuel" },
+            { name: "Ironclad Lines", focus: "Heavy Haul", icon: "truck" },
+            { name: "Great Lakes Freight", focus: "Regional Auto", icon: "car" },
+            { name: "Sunrise Transport", focus: "Dedicated Lanes", icon: "sun" },
+            { name: "Western Star Inc.", focus: "Rocky Mountain", icon: "mountain" },
+            { name: "Eagle Transit Group", focus: "Military Freight", icon: "plane" },
+            { name: "Quantum Shipping", focus: "Expedited Freight", icon: "zap" },
+        ];
+
+
+        // Mock Job Data reflecting the network
+        const mockJobs = [
+            { id: 1, title: "OTR Reefer Driver", location: "Nationwide (Apex Logistics)", pay: "$0.72 CPM", home: "2 weeks out, 3 days home", endorsements: ["Reefer", "Hazmat"] },
+            { id: 2, title: "Local P&D Class A", location: "Chicago, IL (Coastline Trucking)", pay: "$32/Hour", home: "Daily", endorsements: ["Doubles/Triples"] },
+            { id: 3, title: "Flatbed: Weekends Off", location: "Southeast USA (Sentinel Transport)", pay: "$0.68 CPM + Tarp Pay", home: "Weekends Off", endorsements: ["Flatbed"] },
+            { id: 4, title: "Dedicated Automotive Lane", location: "Detroit, MI - Ohio (Great Lakes)", pay: "$75k - $85k Annual", home: "M-F, Weekends Home", endorsements: ["None"] },
+            { id: 5, title: "Team OTR Expedited Freight", location: "Nationwide (Cascade Carriers)", pay: "$0.80 CPM Split", home: "Flexible 3 Weeks Out", endorsements: ["Hazmat", "Doubles/Triples"] },
+        ];
+
+        // Global state for the poll (simulated)
+        let pollVoted = false;
+        let pollResults = {
+            'coffee': 42,
+            'energy': 35,
+            'none': 23 
+        }; // Initial mock votes
+
+        /**
+
+Oleg, [11/13/25 7:06 PM]
+* Toggles visibility of an explanation field based on the radio button selection.
+         * @param {string} radioName - Name of the radio button group (e.g., 'hadFelony').
+         * @param {string} explanationId - ID of the textarea to toggle (e.g., 'felonyExplanationContainer').
+         */
+        function handleComplianceChange(radioName, explanationId) {
+            const yesRadio = document.querySelector(`input[name="${radioName}"][value="Yes"]`);
+            const explanationContainer = document.getElementById(explanationId);
+            
+            if (!yesRadio || !explanationContainer) return;
+
+            // Check if the "Yes" radio button is checked
+            if (yesRadio.checked) {
+                explanationContainer.classList.remove('hidden');
+                explanationContainer.querySelector('textarea').required = true;
+            } else {
+                explanationContainer.classList.add('hidden');
+                explanationContainer.querySelector('textarea').required = false;
+            }
+        }
+
+
+        /**
+         * Simulates a form submission to a backend.
+         */
+        async function submitApplication(formData) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    console.log("Simulating Application Submission:", formData);
+                    resolve({
+                        success: true,
+                        message: "✅ Success! Your Quick Application has been sent to our Placement Team. We will find your best match from our 14 national partners within 1 business hour."
+                    });
+                }, 1500);
+            });
+        }
+
+        /**
+         * Handles navigation logic to show only the requested content section.
+         * @param {string} pageId - The ID of the section to display.
+         */
+        function showPage(pageId) {
+            // Hide all content sections
+            document.querySelectorAll('section[data-page]').forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('block');
+            });
+
+            // Show the requested section
+            const targetSection = document.getElementById(pageId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('block');
+            }
+
+            // Update active navigation link styling
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-target') === pageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            // Ensure mobile menu is closed after click
+            document.getElementById('mobile-menu').classList.add('hidden');
+
+            // If navigating to hub, ensure poll is rendered correctly
+            if (pageId === 'hub') {
+                renderDriverPoll();
+            }
+        }
+
+        /**
+         * Renders the driver poll, showing either the voting options or the results.
+         */
+        function renderDriverPoll() {
+            const pollContainer = document.getElementById('driverPollContainer');
+            if (!pollContainer) return;
+
+            let totalVotes = Object.values(pollResults).reduce((sum, current) => sum + current, 0);
+
+            if (pollVoted) {
+                // Show Results
+                let resultsHtml = <h4 class="text-lg font-bold mb-3 text-logi-blue">Current Results (${totalVotes} votes)</h4>;
+                
+                Object.keys(pollResults).forEach(key => {
+                    const count = pollResults[key];
+                    const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+                    const label = { 'coffee': 'Fresh Coffee', 'energy': 'Energy Drinks', 'none': 'Pure Willpower' }[key];
+                    
+                    resultsHtml += `
+                        <div class="mb-3">
+
+Oleg, [11/13/25 7:06 PM]
+<p class="text-sm font-medium mb-1">${label} (${percentage}%)</p>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-logi-orange h-4 rounded-full transition-all duration-700" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                pollContainer.innerHTML = resultsHtml;
+
+            } else {
+                // Show Voting Options
+                pollContainer.innerHTML = `
+                    <h4 class="text-lg font-bold mb-3 text-logi-blue">What powers your long haul?</h4>
+                    <form id="pollForm" class="space-y-3">
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
+                            <input type="radio" name="powerSource" value="coffee" class="text-logi-orange focus:ring-logi-orange mr-2">
+                            Fresh Coffee (Black, of course)
+                        </label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
+                            <input type="radio" name="powerSource" value="energy" class="text-logi-orange focus:ring-logi-orange mr-2">
+                            Energy Drinks (The sugar rush)
+                        </label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition duration-150">
+                            <input type="radio" name="powerSource" value="none" class="text-logi-orange focus:ring-logi-orange mr-2">
+                            Pure Willpower (and a solid playlist)
+                        </label>
+                        <button type="submit" class="w-full mt-4 bg-logi-blue hover:bg-logi-blue/90 text-white font-bold py-2 rounded-lg transition duration-150 shadow-md">
+                            Vote
+                        </button>
+                    </form>
+                `;
+
+                // Attach submit handler for the poll form
+                document.getElementById('pollForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const selected = document.querySelector('input[name="powerSource"]:checked');
+                    if (selected) {
+                        pollResults[selected.value] += 1; // Add vote
+                        pollVoted = true;
+                        renderDriverPoll(); // Re-render to show results
+                    } else {
+                        const pollMessage = document.createElement('p');
+                        pollMessage.className = 'text-red-500 text-sm mt-2';
+                        pollMessage.textContent = 'Please select an option to vote.';
+                        document.getElementById('pollForm').appendChild(pollMessage);
+                        setTimeout(() => pollMessage.remove(), 3000);
+                    }
+                });
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize icons
+            lucide.createIcons();
+
+            // Set up initial page view (Home)
+            showPage('home');
+
+            // Set up navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetPage = e.currentTarget.getAttribute('data-target');
+                    showPage(targetPage);
+                });
+            });
+
+            // Set up mobile menu toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
+
+            // --- Form Submission Logic (Quick Apply) ---
+            const form = document.getElementById('cdlQuickApplyForm');
+            const submitButton = document.getElementById('submitBtn');
+
+Oleg, [11/13/25 7:06 PM]
+const messageBox = document.getElementById('messageBox');
+
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Matching...
+                    `;
+                    
+                    // Basic data collection (simplified)
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+
+                    if (!data.fullName  !data.phone  !data.email  data.cdlClass === ""  !data.yearsExperience) {
+                        showMessage("🛑 Error: Please complete all required fields.", 'bg-red-500');
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = "Submit Quick Match";
+                        return;
+                    }
+
+                    const response = await submitApplication(data);
+
+                    if (response.success) {
+                        showMessage(response.message, 'bg-green-600');
+                        form.reset();
+                        submitButton.innerHTML = "Matched! Contacting you now.";
+                        setTimeout(() => submitButton.disabled = false, 5000);
+                    } else {
+                        showMessage("Matching failed. Please try again.", 'bg-red-500');
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = "Submit Quick Apply";
+                    }
+                });
+
+                /**
+                 * Displays a temporary message box.
+                 */
+                function showMessage(message, colorClass) {
+                    messageBox.textContent = message;
+                    messageBox.className = p-4 mt-4 rounded-lg text-white font-semibold transition-all duration-300 ${colorClass};
+                    messageBox.classList.remove('hidden');
+                    messageBox.classList.add('block');
+
+                    setTimeout(() => {
+                        messageBox.classList.remove('block');
+                        messageBox.classList.add('hidden');
+                    }, 8000); // Longer duration for critical recruitment info
+                }
+            }
+
+
+            // --- Job Board Logic ---
+            const jobListContainer = document.getElementById('jobList');
+            if (jobListContainer) {
+                renderJobs(mockJobs);
+            }
+
+            function renderJobs(jobs) {
+                jobListContainer.innerHTML = ''; 
+                if (jobs.length === 0) {
+                    jobListContainer.innerHTML = '<p class="text-center text-gray-500 py-8">No current openings match your criteria. Check back soon!</p>';
+                    return;
+                }
+
+                jobs.forEach(job => {
+                    const endorsementBadges = job.endorsements.map(e => `<span class="inline-flex items-center rounded-full bg-logi-blue/10 px-2 py-0.5 text-xs font-medium text-logi-blue">${e}</span>`).join('');
+                    
+                    const jobCard = `
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-lg hover-effect transition duration-200">
+                            <h3 class="text-xl font-bold text-logi-blue">${job.title}</h3>
+                            <p class="text-gray-600 mt-1 flex items-center text-sm">
+
+Oleg, [11/13/25 7:06 PM]
+<i data-lucide="map-pin" class="w-4 h-4 mr-1 text-logi-orange"></i>${job.location}
+                            </p>
+                            
+                            <div class="mt-3 space-y-1 text-sm">
+                                <p class="font-medium flex items-center"><i data-lucide="dollar-sign" class="w-4 h-4 mr-2 text-green-600"></i>Pay: <span class="ml-1 font-semibold">${job.pay}</span></p>
+                                <p class="font-medium flex items-center"><i data-lucide="home" class="w-4 h-4 mr-2 text-red-500"></i>Home Time: <span class="ml-1">${job.home}</span></p>
+                            </div>
+
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                ${endorsementBadges}
+                            </div>
+                            
+                            <button onclick="showPage('apply')" class="mt-5 w-full bg-logi-orange hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-md">
+                                Quick Apply
+                            </button>
+                        </div>
+                    `;
+                    jobListContainer.innerHTML += jobCard;
+                });
+                lucide.createIcons();
+            }
+
+            // --- Partners Section Logic ---
+            const partnersContainer = document.getElementById('partnerList');
+            if (partnersContainer) {
+                renderPartners(mockCarriers);
+            }
+
+            function renderPartners(carriers) {
+                partnersContainer.innerHTML = '';
+                carriers.forEach((carrier, index) => {
+                    const carrierCard = `
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex flex-col items-center text-center">
+                            <i data-lucide="${carrier.icon}" class="w-8 h-8 text-logi-blue mb-3"></i>
+                            <h3 class="text-xl font-bold text-logi-blue">${carrier.name}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${carrier.focus}</p>
+                            <span class="mt-3 inline-block bg-logi-orange text-white text-xs font-semibold px-3 py-1 rounded-full">Partner #${index + 1}</span>
+                        </div>
+                    `;
+                    partnersContainer.innerHTML += carrierCard;
+                });
+                lucide.createIcons();
+            }
+        });
+    </script>
+</head>
+<body class="flex flex-col items-center min-h-screen">
+
+    <!-- Sticky Navigation Header -->
+    <header class="w-full bg-logi-blue shadow-lg sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Brand -->
+                <a href="#" onclick="showPage('home'); return false;" class="text-2xl font-extrabold text-white flex items-center">
+                    <i data-lucide="route" class="w-6 h-6 mr-2 text-logi-orange"></i>
+                    DriverMatch Network
+                </a>
+                
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:block">
+                    <div class="flex space-x-4">
+                        <a href="#" data-target="home" class="nav-link text-white px-3 py-2 text-sm transition duration-150">Home</a>
+                        <a href="#" data-target="jobs" class="nav-link text-white px-3 py-2 text-sm transition duration-150">Open Jobs</a>
+                        <a href="#" data-target="partners" class="nav-link text-white px-3 py-2 text-sm transition duration-150">14 Partner Carriers</a>
+                        <a href="#" data-target="benefits" class="nav-link text-white px-3 py-2 text-sm transition duration-150">Network Pay & Benefits</a>
+                        <a href="#" data-target="safety" class="nav-link text-white px-3 py-2 text-sm transition duration-150">Fleet & Safety</a>
+
+Oleg, [11/13/25 7:06 PM]
+<a href="#" data-target="hub" class="nav-link text-white px-3 py-2 text-sm transition duration-150">Driver Hub</a>
+                        <a href="#" data-target="apply" class="nav-link bg-logi-orange rounded-lg text-white font-bold px-3 py-2 text-sm hover:bg-yellow-600 transition duration-150 shadow-lg">QUICK MATCH</a>
+                    </div>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" type="button" class="lg:hidden text-white hover:text-logi-orange p-2 rounded-md transition duration-150" aria-controls="mobile-menu" aria-expanded="false">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div class="lg:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 border-t border-logi-blue/50">
+                <a href="#" data-target="home" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">Home</a>
+                <a href="#" data-target="jobs" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">Open Jobs</a>
+                <a href="#" data-target="partners" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">14 Partner Carriers</a>
+                <a href="#" data-target="benefits" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">Pay & Benefits</a>
+                <a href="#" data-target="safety" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">Fleet & Safety</a>
+                <a href="#" data-target="hub" class="nav-link block text-white bg-logi-blue/90 px-3 py-2 rounded-md text-base transition duration-150">Driver Hub</a>
+                <a href="#" data-target="apply" class="nav-link block bg-logi-orange text-white font-bold px-3 py-2 rounded-md text-base transition duration-150 shadow-md mt-2">QUICK MATCH</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        
+        <!-- ============================================== -->
+        <!-- 1. HOME SECTION (Landing Page) -->
+        <!-- ============================================== -->
+        <section id="home" data-page="home" class="block">
+            <div class="bg-white p-8 sm:p-12 rounded-xl shadow-2xl text-center border-t-8 border-logi-orange">
+                <h1 class="text-4xl sm:text-6xl font-extrabold text-logi-blue leading-tight mb-4">
+                    FIND YOUR PERFECT TRUCK: 14 CARRIERS. ONE APPLICATION.
+                </h1>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto mb-10">
+                    Stop filling out dozens of applications. We match your CDL, experience, and home time preferences to the *best* job openings across our exclusive network of 14 top-tier, national trucking companies.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <button onclick="showPage('apply')" class="bg-logi-orange hover:bg-yellow-600 text-white font-bold py-4 px-10 rounded-lg text-xl transition duration-200 shadow-xl flex items-center justify-center">
+                        <i data-lucide="send" class="w-6 h-6 mr-2"></i> START QUICK MATCH
+                    </button>
+                    <button onclick="showPage('jobs')" class="bg-logi-blue hover:bg-logi-blue/90 text-white font-bold py-4 px-10 rounded-lg text-xl transition duration-200 shadow-xl flex items-center justify-center">
+                        <i data-lucide="search" class="w-5 h-5 mr-2"></i> EXPLORE ALL OPENINGS
+                    </button>
+                </div>
+
+Oleg, [11/13/25 7:06 PM]
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 text-left">
+                    <div class="p-6 rounded-xl bg-gray-100 border border-gray-200 hover-effect">
+                        <i data-lucide="clipboard-check" class="w-8 h-8 text-logi-blue mb-2"></i>
+                        <h3 class="font-bold text-lg">Single Application</h3>
+                        <p class="text-sm text-gray-600">Apply once, get considered by 14 national carriers. Maximize your options.</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gray-100 border border-gray-200 hover-effect">
+                        <i data-lucide="git-fork" class="w-8 h-8 text-logi-blue mb-2"></i>
+                        <h3 class="font-bold text-lg">True Choice</h3>
+                        <p class="text-sm text-gray-600">Local, OTR, Dedicated, Reefer, Flatbed—we have the route you want.</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gray-100 border border-gray-200 hover-effect">
+                        <i data-lucide="handshake" class="w-8 h-8 text-logi-blue mb-2"></i>
+                        <h3 class="font-bold text-lg">Driver Advocate</h3>
+                        <p class="text-sm text-gray-600">We negotiate your pay and benefits package for you.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ============================================== -->
+        <!-- 2. AVAILABLE JOBS SECTION -->
+        <!-- ============================================== -->
+        <section id="jobs" data-page="jobs" class="hidden">
+            <h2 class="text-3xl font-bold text-logi-blue mb-6 border-b pb-2">Top Openings Across the DriverMatch Network</h2>
+            
+            <div class="p-4 bg-white rounded-xl shadow-lg mb-6 border-t-4 border-logi-orange">
+                <p class="font-semibold text-gray-700 mb-2 flex items-center"><i data-lucide="filter" class="w-4 h-4 mr-2"></i>Quick Filters</p>
+                <div class="flex flex-wrap gap-3 text-sm">
+                    <button class="bg-logi-blue text-white px-3 py-1 rounded-full text-xs hover:opacity-80 transition duration-150">Local (Daily Home)</button>
+                    <button class="bg-logi-blue text-white px-3 py-1 rounded-full text-xs hover:opacity-80 transition duration-150">Dedicated (Consistent)</button>
+                    <button class="bg-logi-orange text-white px-3 py-1 rounded-full text-xs hover:opacity-80 transition duration-150">High CPM (> $0.70)</button>
+                    <button class="bg-logi-orange text-white px-3 py-1 rounded-full text-xs hover:opacity-80 transition duration-150">Sign-on Bonus</button>
+                    <button class="bg-logi-blue text-white px-3 py-1 rounded-full text-xs hover:opacity-80 transition duration-150">Team Driving</button>
+                </div>
+            </div>
+
+            <div id="jobList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Job cards will be injected here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 3. PARTNER CARRIERS SECTION -->
+        <!-- ============================================== -->
+        <section id="partners" data-page="partners" class="hidden">
+            <h2 class="text-3xl font-bold text-logi-blue mb-6 border-b pb-2">Our 14 Elite National Partner Carriers</h2>
+            
+            <p class="text-gray-600 mb-8">We partner only with companies known for exceptional safety records, driver respect, and competitive pay. This diversity means we *always* have a spot for qualified CDL drivers.</p>
+
+            <div id="partnerList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Partner cards will be injected here by JavaScript -->
+            </div>
+            
+            <div class="mt-10 text-center">
+
+Oleg, [11/13/25 7:06 PM]
+<button onclick="showPage('apply')" class="bg-logi-orange hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-200 shadow-xl">
+                    Ready to work for one of them? Start your Quick Match now.
+                </button>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 4. NETWORK PAY & BENEFITS SECTION -->
+        <!-- ============================================== -->
+        <section id="benefits" data-page="benefits" class="hidden">
+            <h2 class="text-3xl font-bold text-logi-blue mb-6 border-b pb-2">Best-In-Class Pay and Comprehensive Network Benefits</h2>
+            
+            <p class="text-gray-600 mb-6">By working with 14 national carriers, we guarantee competitive rates and benefits that meet or exceed industry averages, tailored to your location and preferred freight type.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Compensation Card -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-logi-orange/50">
+                    <i data-lucide="trending-up" class="w-8 h-8 text-logi-orange mb-3"></i>
+                    <h3 class="text-2xl font-semibold mb-2 text-logi-blue">Earning Potential</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>**Top Tier Pay:** Average OTR pay $0.68 - $0.75+ CPM.</li>
+                        <li>**Guaranteed Weekly Minimums** available across all segments.</li>
+                        <li>**Recruiter Negotiated Bonuses:** We secure the maximum sign-on bonuses.</li>
+                        <li>**Full Compensation:** Paid for detention, layover, and breakdown time.</li>
+                    </ul>
+                </div>
+
+                <!-- Life & Culture Card -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-logi-orange/50">
+                    <i data-lucide="home" class="w-8 h-8 text-logi-orange mb-3"></i>
+                    <h3 class="text-2xl font-semibold mb-2 text-logi-blue">Home Time & Quality of Life</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li>**Flexible Schedules:** Options for daily, weekly, or bi-weekly home time.</li>
+                        <li>**Immediate PTO:** Many carriers offer paid time off starting Day 1.</li>
+                        <li>**Dispatcher Support:** Dedicated, human dispatchers who know your name.</li>
+                        <li>**Riders/Pets:** Wide network acceptance of passenger and pet policies.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 5. SAFETY & EQUIPMENT SECTION -->
+        <!-- ============================================== -->
+        <section id="safety" data-page="safety" class="hidden">
+            <h2 class="text-3xl font-bold text-logi-blue mb-6 border-b pb-2">Network Fleet Standards: Safety First</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Fleet Age -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-logi-blue">
+                        <h3 class="text-2xl font-semibold mb-3 flex items-center"><i data-lucide="gauge" class="w-6 h-6 mr-2 text-logi-orange"></i> Fleet & Maintenance Standards</h3>
+                        <p class="text-gray-700 mb-4">We only partner with carriers who maintain a fleet average age of under 4 years and commit to proactive, not reactive, maintenance. We filter out companies with unreliable or outdated equipment.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm pl-4">
+                            <li>Modern trucks from major manufacturers (Volvo, Freightliner, Peterbilt).</li>
+
+Oleg, [11/13/25 7:06 PM]
+<li>Strict preventative maintenance schedules across the network.</li>
+                            <li>Minimal downtime due to superior equipment quality.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Safety Technology -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-logi-blue">
+                        <h3 class="text-2xl font-semibold mb-3 flex items-center"><i data-lucide="monitor" class="w-6 h-6 mr-2 text-logi-orange"></i> Required In-Cab Tech</h3>
+                        <p class="text-gray-700 mb-4">All partner carriers use advanced safety technology to protect drivers and assets:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Collision Mitigation & Adaptive Cruise</li>
+                                <li>In-Cab Communications & GPS</li>
+                            </ul>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Automatic APUs/Inverters (OTR)</li>
+                                <li>Electronic Logging Devices (ELDs)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Score Card -->
+                <div class="lg:col-span-1 bg-logi-orange text-white p-6 rounded-xl shadow-2xl flex flex-col justify-center text-center">
+                    <h3 class="text-2xl font-bold mb-3">Network Safety Focus</h3>
+                    <p class="text-4xl font-extrabold mb-2">A++ Rated</p>
+                    <p class="text-sm font-light border-t border-white/50 pt-2">
+                        We only work with carriers who meet strict FMCSR and DOT compliance standards.
+                    </p>
+                    <button onclick="showPage('apply')" class="mt-4 w-full bg-logi-blue hover:bg-logi-blue/90 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-md">
+                        Find a Safer Fleet
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 6. DRIVER HUB SECTION (Entertainment/Community) -->
+        <!-- ============================================== -->
+        <section id="hub" data-page="hub" class="hidden">
+            <h2 class="text-3xl font-bold text-logi-blue mb-6 border-b pb-2 flex items-center">
+                <i data-lucide="message-square" class="w-8 h-8 mr-2 text-logi-orange"></i>
+                The National Driver Hub
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Column 1: Joke & Tip -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Trucker Humor Box -->
+                    <div class="hub-joke-box p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-bold text-logi-orange flex items-center mb-3">
+                            <i data-lucide="laugh" class="w-5 h-5 mr-2"></i>
+                            Road Humor
+                        </h3>
+                        <p class="text-gray-800 italic">
+                            A trucker goes to a diner and orders two steaks, a full salad, and a piece of pie.
+                        </p>
+                        <p class="mt-3 text-lg font-semibold text-logi-blue">
+                            He says, "I'm on a dedicated route... to the buffet!"
+                        </p>
+                    </div>
+
+                    <!-- Driver Tip -->
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+                        <h3 class="text-xl font-bold text-green-700 flex items-center mb-3">
+                            <i data-lucide="lightbulb" class="w-5 h-5 mr-2"></i>
+                            Pre-Pass Trick
+                        </h3>
+
+Oleg, [11/13/25 7:06 PM]
+<p class="text-gray-700 text-sm">
+                            Always ensure your pre-pass transponder is properly mounted and clean. An improperly mounted transponder can lead to missed signals and unnecessary stops, wasting precious minutes and hours.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Column 2 & 3: Interactive Poll & Resources -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Interactive Poll -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4 text-gray-800 flex items-center"><i data-lucide="bar-chart-3" class="w-6 h-6 mr-2 text-logi-blue"></i> Community Poll: On the Road</h3>
+                        <div id="driverPollContainer">
+                            <!-- Poll content is injected by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Resources -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-logi-blue">
+                        <h3 class="text-xl font-bold text-logi-blue mb-3">Quick Resources</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="#" class="flex items-center text-logi-orange hover:underline text-sm"><i data-lucide="map" class="w-4 h-4 mr-1"></i> I-80 Rest Area Guide</a>
+                            <a href="#" class="flex items-center text-logi-orange hover:underline text-sm"><i data-lucide="file-text" class="w-4 h-4 mr-1"></i> Best Practices: ELD & HOS</a>
+                            <a href="#" class="flex items-center text-logi-orange hover:underline text-sm"><i data-lucide="settings" class="w-4 h-4 mr-1"></i> Fleet Maintenance Checklist</a>
+                            <a href="#" class="flex items-center text-logi-orange hover:underline text-sm"><i data-lucide="phone" class="w-4 h-4 mr-1"></i> Placement Team Contact</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- 7. QUICK APPLY SECTION (The Form) -->
+        <!-- ============================================== -->
+        <section id="apply" data-page="apply" class="hidden">
+            <div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl border-t-8 border-logi-blue">
+                <h2 class="text-3xl font-bold mb-6 text-logi-blue">60-Second Quick Match Application</h2>
+                <p class="text-gray-600 mb-6">Provide this essential information. Our Placement Team will find your perfect job from our 14 national carriers.</p>
+                
+                <form id="cdlQuickApplyForm">
+                    
+                    <!-- 1. Contact Information -->
+                    <div class="mb-6 p-4 border rounded-lg bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-800 flex items-center"><i data-lucide="user" class="w-4 h-4 mr-2"></i> 1. Contact Info</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name*</label>
+                                <input type="text" id="fullName" name="fullName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-logi-blue focus:ring-logi-blue p-2 border">
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number*</label>
+                                <input type="tel" id="phone" name="phone" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-logi-blue focus:ring-logi-blue p-2 border">
+                            </div>
+                            <div class="md:col-span-2">
+
+Oleg, [11/13/25 7:06 PM]
+<label for="email" class="block text-sm font-medium text-gray-700">Email Address*</label>
+                                <input type="email" id="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-logi-blue focus:ring-logi-blue p-2 border">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. CDL & Experience -->
+                    <div class="mb-6 p-4 border rounded-lg bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-800 flex items-center"><i data-lucide="award" class="w-4 h-4 mr-2"></i> 2. CDL & Experience</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="cdlClass" class="block text-sm font-medium text-gray-700">CDL Class*</label>
+                                <select id="cdlClass" name="cdlClass" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-logi-blue focus:ring-logi-blue p-2 border">
+                                    <option value="">Select Class</option>
+                                    <option value="A">Class A</option>
+                                    <option value="B">Class B</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="yearsExperience" class="block text-sm font-medium text-gray-700">Verifiable CDL Experience (Years)*</label>
+                                <input type="number" id="yearsExperience" name="yearsExperience" min="0" max="50" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-logi-blue focus:ring-logi-blue p-2 border">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Key Endorsements Held</label>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="endorsements" value="Hazmat" class="rounded text-logi-blue focus:ring-logi-blue">
+                                    <span class="ml-2 text-gray-700">Hazmat (H)</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="endorsements" value="Tanker" class="rounded text-logi-blue focus:ring-logi-blue">
+                                    <span class="ml-2 text-gray-700">Tanker (N)</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="endorsements" value="Doubles/Triples" class="rounded text-logi-blue focus:ring-logi-blue">
+                                    <span class="ml-2 text-gray-700">Doubles/Triples (T)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Compliance & History -->
+                    <div class="mb-6 p-4 border rounded-lg bg-gray-50 border-logi-orange/50">
+                        <h3 class="text-lg font-semibold mb-4 text-logi-orange flex items-center"><i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> 3. Compliance & Safety History</h3>
+                        
+                        <!-- Question template -->
+                        <div class="space-y-4">
+                            <!-- Q1: Felony -->
+                            <div class="border-b pb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Have you had a felony conviction related to motor vehicle operation in the last 7 years?</label>
+
+Oleg, [11/13/25 7:06 PM]
+<div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadFelony" value="Yes" class="text-logi-blue focus:ring-logi-blue" onclick="handleComplianceChange('hadFelony', 'felonyExplanationContainer')">
+                                        <span class="ml-2 text-gray-700 font-semibold">Yes</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadFelony" value="No" class="text-logi-blue focus:ring-logi-blue" checked onclick="handleComplianceChange('hadFelony', 'felonyExplanationContainer')">
+                                        <span class="ml-2 text-gray-700">No</span>
+                                    </label>
+                                </div>
+                                <div id="felonyExplanationContainer" class="mt-3 p-3 bg-red-100 rounded-md hidden">
+                                    <label for="felonyExplanation" class="block text-sm font-medium text-red-700">Please briefly explain the felony:</label>
+                                    <textarea id="felonyExplanation" name="felonyExplanation" rows="2" class="mt-1 block w-full rounded-md border-red-500 shadow-sm p-2 text-red-700"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Q2: SAP Program -->
+                            <div class="border-b pb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Have you ever failed or refused a DOT drug/alcohol test, requiring the SAP program?</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadSAP" value="Yes" class="text-logi-blue focus:ring-logi-blue" onclick="handleComplianceChange('hadSAP', 'sapExplanationContainer')">
+                                        <span class="ml-2 text-gray-700 font-semibold">Yes</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadSAP" value="No" class="text-logi-blue focus:ring-logi-blue" checked onclick="handleComplianceChange('hadSAP', 'sapExplanationContainer')">
+                                        <span class="ml-2 text-gray-700">No</span>
+                                    </label>
+                                </div>
+                                <div id="sapExplanationContainer" class="mt-3 p-3 bg-red-100 rounded-md hidden">
+                                    <label for="sapExplanation" class="block text-sm font-medium text-red-700">Please briefly explain your SAP status:</label>
+                                    <textarea id="sapExplanation" name="sapExplanation" rows="2" class="mt-1 block w-full rounded-md border-red-500 shadow-sm p-2 text-red-700"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Q3: Accidents -->
+                            <div class="border-b pb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Have you had any preventable DOT recordable accidents in the last 3 years?</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadAccidents" value="Yes" class="text-logi-blue focus:ring-logi-blue" onclick="handleComplianceChange('hadAccidents', 'accidentExplanationContainer')">
+                                        <span class="ml-2 text-gray-700 font-semibold">Yes</span>
+                                    </label>
+
+Oleg, [11/13/25 7:06 PM]
+<label class="inline-flex items-center">
+                                        <input type="radio" name="hadAccidents" value="No" class="text-logi-blue focus:ring-logi-blue" checked onclick="handleComplianceChange('hadAccidents', 'accidentExplanationContainer')">
+                                        <span class="ml-2 text-gray-700">No</span>
+                                    </label>
+                                </div>
+                                <div id="accidentExplanationContainer" class="mt-3 p-3 bg-yellow-100 rounded-md hidden">
+                                    <label for="accidentExplanation" class="block text-sm font-medium text-yellow-800">Please provide a brief summary of the accident(s) and date(s):</label>
+                                    <textarea id="accidentExplanation" name="accidentExplanation" rows="2" class="mt-1 block w-full rounded-md border-yellow-500 shadow-sm p-2 text-yellow-800"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Q4: Moving Violations -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Have you had 3 or more moving violations in the last 3 years?</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadViolations" value="Yes" class="text-logi-blue focus:ring-logi-blue" onclick="handleComplianceChange('hadViolations', 'violationExplanationContainer')">
+                                        <span class="ml-2 text-gray-700 font-semibold">Yes</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="hadViolations" value="No" class="text-logi-blue focus:ring-logi-blue" checked onclick="handleComplianceChange('hadViolations', 'violationExplanationContainer')">
+                                        <span class="ml-2 text-gray-700">No</span>
+                                    </label>
+                                </div>
+                                <div id="violationExplanationContainer" class="mt-3 p-3 bg-yellow-100 rounded-md hidden">
+                                    <label for="violationExplanation" class="block text-sm font-medium text-yellow-800">Please briefly list the violations and dates:</label>
+                                    <textarea id="violationExplanation" name="violationExplanation" rows="2" class="mt-1 block w-full rounded-md border-yellow-500 shadow-sm p-2 text-yellow-800"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Submit Button and Message -->
+                    <button type="submit" id="submitBtn" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-xl text-lg font-bold text-white bg-logi-orange hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-logi-orange transition duration-150 ease-in-out">
+                        Submit Quick Match
+                    </button>
+                </form>
+                
+                <!-- Message Box for Feedback -->
+                <div id="messageBox" class="hidden" role="alert"></div>
+
+                <p class="text-xs text-gray-500 mt-4 text-center">
+                    *Required fields. All compliance information is handled securely and confidentially for DOT screening purposes only.
+                </p>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-8 w-full bg-logi-blue text-white text-center text-sm py-4">
+        <div class="max-w-7xl mx-auto px-4">
+            &copy; 2025 DriverMatch Network. All rights reserved.
+
+Oleg, [11/13/25 7:06 PM]
+| <a href="#" onclick="showPage('home'); return false;" class="underline hover:text-logi-orange">Privacy Policy</a>
+        </div>
+    </footer>
+
+</body>
+</html> this all is one file right
